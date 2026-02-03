@@ -8,10 +8,16 @@
 
 package io.element.android.libraries.push.impl.notifications.channels
 
+import io.element.android.libraries.matrix.api.core.RoomId
+
 class FakeNotificationChannels(
     var channelForIncomingCall: (ring: Boolean) -> String = { _ -> "" },
     var channelIdForMessage: (noisy: Boolean) -> String = { _ -> "" },
-    var channelIdForTest: () -> String = { "" }
+    var channelIdForTest: () -> String = { "" },
+    var getOrCreateChannelForRoomResult: (RoomId, String) -> String = { roomId, _ -> "ROOM_CHANNEL_${roomId.value}" },
+    var deleteChannelForRoomResult: (RoomId) -> Boolean = { _ -> true },
+    var hasChannelForRoomResult: (RoomId) -> Boolean = { _ -> false },
+    var getChannelIdForRoomResult: (RoomId) -> String? = { _ -> null },
 ) : NotificationChannels {
     override fun getChannelForIncomingCall(ring: Boolean): String {
         return channelForIncomingCall(ring)
@@ -23,5 +29,21 @@ class FakeNotificationChannels(
 
     override fun getChannelIdForTest(): String {
         return channelIdForTest()
+    }
+
+    override fun getOrCreateChannelForRoom(roomId: RoomId, roomDisplayName: String): String {
+        return getOrCreateChannelForRoomResult(roomId, roomDisplayName)
+    }
+
+    override fun deleteChannelForRoom(roomId: RoomId): Boolean {
+        return deleteChannelForRoomResult(roomId)
+    }
+
+    override fun hasChannelForRoom(roomId: RoomId): Boolean {
+        return hasChannelForRoomResult(roomId)
+    }
+
+    override fun getChannelIdForRoom(roomId: RoomId): String? {
+        return getChannelIdForRoomResult(roomId)
     }
 }
